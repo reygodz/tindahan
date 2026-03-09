@@ -3,10 +3,14 @@ from flask import Flask, request, render_template
 app = Flask(__name__)
 
 users = {
-    "admin" : "password123",
+    "admin" : "admin",
     "cashier" : "cashierpass",
     "manager" : "managerpass"
 }
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template('dashboard.html')
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -15,7 +19,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
         if username in users and users[username] == password:
-             return "Login successful!"
+            return render_template('dashboard.html')
         
         return  render_template('login.html', error="Invalid username or password.")
 
