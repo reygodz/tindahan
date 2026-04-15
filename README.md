@@ -114,11 +114,6 @@ You should see the TINDAHAN login page.
 - Username: `admin`
 - Password: `admin123`
 
-**Manager Account:**
-
-- Username: `manager`
-- Password: `manager123`
-
 **Staff Account:**
 
 - Username: `staff`
@@ -600,7 +595,6 @@ prod_002   | Sugar       | 75  | ₱60   | ₱4,500
 **Login:**
 
 - Username: `admin` | Password: `admin123`
-- Username: `manager` | Password: `manager123`
 
 ### **Staff Role**
 
@@ -766,7 +760,6 @@ python app.py --port 5001
 **Solution:** Check spelling
 
 - Admin: `admin` / `admin123`
-- Manager: `manager` / `manager123`
 - Staff: `staff` / `staff123`
 
 ### Issue: "Data disappears after restart"
