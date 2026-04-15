@@ -769,7 +769,7 @@ For persistent data, implement SQLite or PostgreSQL (future feature).
 
 ---
 
-## Future Enhancements
+## Enhancements you can do on your free time for self improvement (goodluck by sir god)
 
 - [ ] Database persistence (SQLite/PostgreSQL)
 - [ ] User registration & password management
