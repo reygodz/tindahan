@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('inventory') }}" class="nav-link">Inventory</a>
+          <a href="{{ url_for('sales_page') }}" class="nav-link">Sales</a>
+          <a href="{{ url_for('reports') }}" class="nav-link active">Reports</a>
+          <span class="username">User</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Reports & Analytics</h1>
+        </div>
+
+        <!-- Sales Report -->
+        <div class="report-section">
+          <h2>Sales Report</h2>
+          <div class="report-stats">
+            <div class="report-stat">
+              <label>Total Transactions</label>
+              <p>{{ reports.sales_report.total_transactions }}</p>
+            </div>
+            <div class="report-stat">
+              <label>Total Sales Value</label>
+              <p>{{ reports.sales_report.total_value }}</p>
+            </div>
+            <div class="report-stat">
+              <label>Average Transaction</label>
+              <p>{{ reports.sales_report.average_transaction }}</p>
+            </div>
+          </div>
+
+          <h3>Top Selling Products</h3>
+          {% if reports.sales_report.top_products %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity Sold</th>
+                <th>Sales Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in reports.sales_report.top_products %}
+              <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No sales data yet</p>
+          {% endif %}
+        </div>
+
+        <!-- Inventory Report -->
+        <div class="report-section">
+          <h2>Inventory Report</h2>
+          <div class="report-stats">
+            <div class="report-stat">
+              <label>Total Inventory Value</label>
+              <p>{{ reports.inventory_report.total_value }}</p>
+            </div>
+            <div class="report-stat">
+              <label>Total Items</label>
+              <p>{{ reports.inventory_report.total_items }}</p>
+            </div>
+          </div>
+
+          <h3>Low Stock Items (< 20)</h3>
+          {% if reports.inventory_report.low_stock %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Current Stock</th>
+                <th>Unit Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in reports.inventory_report.low_stock %}
+              <tr class="danger">
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No low stock items</p>
+          {% endif %}
+
+          <h3>Overstock Items (> 100)</h3>
+          {% if reports.inventory_report.overstock %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Current Stock</th>
+                <th>Unit Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in reports.inventory_report.overstock %}
+              <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No overstock items</p>
+          {% endif %}
+        </div>
+
+        <!-- Cashier Performance -->
+        <div class="report-section">
+          <h2>Cashier Performance</h2>
+          {% if reports.cashier_report %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Cashier</th>
+                <th>Transactions</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cashier in reports.cashier_report %}
+              <tr>
+                <td>{{ cashier.cashier }}</td>
+                <td>{{ cashier.transactions }}</td>
+                <td>{{ cashier.total }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No cashier data yet</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

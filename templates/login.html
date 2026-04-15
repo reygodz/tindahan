@@ -3,19 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tindahan</title>
+    <title>Tindahan - Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
-  <body>
-    <h3>Sign In</h3>
-    <form method="POST">
-      {% if error %}
-      <p style="color: red">{{ error }}</p>
-      {% endif %}
-      <input type="text" name="username" placeholder="Username" required />
-      <br /><br />
-      <input type="password" name="password" placeholder="Password" required />
-      <br /><br />
-      <input type="submit" value="Submit" />
-    </form>
+  <body class="login-page">
+    <div class="login-container">
+      <div class="login-box">
+        <div class="login-header">
+          <h1>TINDAHAN</h1>
+          <p>Retail Inventory & Sales Management</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('login') }}" class="login-form">
+          {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              placeholder="Enter username"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">LOGIN</button>
+        </form>
+
+        <div class="demo-credentials">
+          <hr />
+          <p><strong>Demo Credentials:</strong></p>
+          <strong>Admin:</strong> admin / admin123<br />
+          <strong>Manager:</strong> manager / manager123<br />
+          <strong>Staff:</strong> staff / staff123
+        </div>
+      </div>
+    </div>
   </body>
 </html>

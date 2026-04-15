@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Sales Report - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          <span class="username">{{ session.user }}</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Daily Sales Report</h1>
+          <p>Date: {{ report.date }}</p>
+        </div>
+
+        <div class="report-stats">
+          <div class="report-stat">
+            <label>Total Transactions</label>
+            <p>{{ report.total_transactions }}</p>
+          </div>
+          <div class="report-stat">
+            <label>Total Sales Amount</label>
+            <p>{{ report.total_amount }}</p>
+          </div>
+          <div class="report-stat">
+            <label>Best Selling Product</label>
+            <p>{{ report.best_selling.name }}</p>
+            <small
+              >{{ report.best_selling.quantity }} units sold - {{
+              report.best_selling.value }}</small
+            >
+          </div>
+        </div>
+
+        <div class="report-section">
+          <h2>All Transactions Today</h2>
+          {% if report.transactions %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+                <th>Cashier</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for trans in report.transactions %}
+              <tr>
+                <td>{{ trans.time }}</td>
+                <td>{{ trans.product }}</td>
+                <td>{{ trans.quantity }}</td>
+                <td>{{ trans.unit_price }}</td>
+                <td>{{ trans.total }}</td>
+                <td>{{ trans.cashier }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No sales today</p>
+          {% endif %}
+        </div>
+
+        <a href="{{ url_for('reports') }}" class="btn btn-primary"
+          >Back to Reports</a
+        >
+      </div>
+    </div>
+  </body>
+</html>

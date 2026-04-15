@@ -3,9 +3,98 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tindahan</title>
+    <title>Dashboard - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
   <body>
-    <h1>Welcome! Dashboard</h1>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link active"
+            >Dashboard</a
+          >
+          {% if stats.role == 'admin' %}
+          <a href="{{ url_for('inventory') }}" class="nav-link">Inventory</a>
+          <a href="{{ url_for('stock_management') }}" class="nav-link"
+            >Stock Mgmt</a
+          >
+          {% endif %}
+          <a href="{{ url_for('sales_page') }}" class="nav-link">Sales</a>
+          <a href="{{ url_for('sales_history') }}" class="nav-link">History</a>
+          {% if stats.role == 'admin' %}
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          {% endif %}
+          <span class="username"
+            >{{ stats.user }} ({{ stats.role|upper }})</span
+          >
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Welcome back, {{ stats.user }}!</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon products">📦</div>
+            <div class="stat-content">
+              <h3>Total Products</h3>
+              <p class="stat-value">{{ stats.total_products }}</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon inventory">💰</div>
+            <div class="stat-content">
+              <h3>Inventory Value</h3>
+              <p class="stat-value">{{ stats.total_inventory_value }}</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon sales">🛒</div>
+            <div class="stat-content">
+              <h3>Total Sales</h3>
+              <p class="stat-value">{{ stats.total_sales }}</p>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon revenue">📊</div>
+            <div class="stat-content">
+              <h3>Sales Revenue</h3>
+              <p class="stat-value">{{ stats.total_sales_value }}</p>
+            </div>
+          </div>
+
+          <div class="stat-card alert-card">
+            <div class="stat-icon warning">⚠️</div>
+            <div class="stat-content">
+              <h3>Low Stock Items</h3>
+              <p class="stat-value">{{ stats.low_stock_items }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-actions">
+          <a href="{{ url_for('inventory') }}" class="btn btn-primary"
+            >Manage Inventory</a
+          >
+          <a href="{{ url_for('sales_page') }}" class="btn btn-success"
+            >Process Sale</a
+          >
+          <a href="{{ url_for('reports') }}" class="btn btn-info"
+            >View Reports</a
+          >
+        </div>
+      </div>
+    </div>
   </body>
 </html>

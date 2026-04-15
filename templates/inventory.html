@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inventory - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('inventory') }}" class="nav-link active"
+            >Inventory</a
+          >
+          <a href="{{ url_for('sales_page') }}" class="nav-link">Sales</a>
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          <span class="username">User</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Product Inventory</h1>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="openAddModal()"
+          >
+            + Add Product
+          </button>
+        </div>
+
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>Product Name</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Value</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+            <tr>
+              <td>{{ product.id }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.price }}</td>
+              <td>{{ product.quantity }}</td>
+              <td>{{ product.value }}</td>
+              <td>
+                <button
+                  class="btn btn-sm btn-warning"
+                  onclick="editProduct('{{ product.id }}', '{{ product.name }}', {{ product.price | replace('₱', '') | replace(',', '') }}, {{ product.quantity }})"
+                >
+                  Edit
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  onclick="deleteProduct('{{ product.id }}')"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="productModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle">Add Product</h2>
+
+        <form id="productForm">
+          <input type="hidden" id="productId" />
+
+          <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" class="form-control" id="productName" required />
+          </div>
+
+          <div class="form-group">
+            <label for="productPrice">Price</label>
+            <input
+              type="number"
+              class="form-control"
+              id="productPrice"
+              step="0.01"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="productQuantity">Quantity</label>
+            <input
+              type="number"
+              class="form-control"
+              id="productQuantity"
+              required
+            />
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="saveProduct()">
+            Save Product
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal()"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function openAddModal() {
+        document.getElementById("modalTitle").textContent = "Add Product";
+        document.getElementById("productForm").reset();
+        document.getElementById("productId").value = "";
+        document.getElementById("productModal").style.display = "block";
+      }
+
+      function editProduct(id, name, price, qty) {
+        document.getElementById("modalTitle").textContent = "Edit Product";
+        document.getElementById("productId").value = id;
+        document.getElementById("productName").value = name;
+        document.getElementById("productPrice").value = price;
+        document.getElementById("productQuantity").value = qty;
+        document.getElementById("productModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("productModal").style.display = "none";
+      }
+
+      function saveProduct() {
+        const id = document.getElementById("productId").value;
+        const formData = new FormData();
+        formData.append("name", document.getElementById("productName").value);
+        formData.append("price", document.getElementById("productPrice").value);
+        formData.append(
+          "quantity",
+          document.getElementById("productQuantity").value,
+        );
+
+        const url = id ? `/inventory/update/${id}` : "/inventory/add";
+
+        fetch(url, { method: "POST", body: formData })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Product saved successfully!");
+              location.reload();
+            } else {
+              alert("Error: " + data.message);
+            }
+          });
+      }
+
+      function deleteProduct(id) {
+        if (confirm("Are you sure?")) {
+          fetch(`/inventory/delete/${id}`, { method: "POST" })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.success) {
+                alert("Product deleted!");
+                location.reload();
+              }
+            });
+        }
+      }
+
+      window.onclick = function (e) {
+        const modal = document.getElementById("productModal");
+        if (e.target === modal) modal.style.display = "none";
+      };
+    </script>
+  </body>
+</html>

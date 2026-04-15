@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monthly Sales Report - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          <span class="username">{{ session.user }}</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Monthly Sales Report</h1>
+          <form method="POST" style="display: inline">
+            <input
+              type="month"
+              name="month_year"
+              value="{{ report.month_year }}"
+              required
+            />
+            <button type="submit" class="btn btn-primary">View</button>
+          </form>
+        </div>
+
+        <div class="report-stats">
+          <div class="report-stat">
+            <label>Total Transactions</label>
+            <p>{{ report.total_transactions }}</p>
+          </div>
+          <div class="report-stat">
+            <label>Total Monthly Sales</label>
+            <p>{{ report.total_amount }}</p>
+          </div>
+          <div class="report-stat">
+            <label>Average Daily Sales</label>
+            <p>{{ report.average_daily }}</p>
+          </div>
+        </div>
+
+        <div class="report-section">
+          <h2>Product Sales Summary</h2>
+          {% if report.product_summary %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity Sold</th>
+                <th>Sales Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in report.product_summary %}
+              <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>{{ product.value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No sales data for this month</p>
+          {% endif %}
+        </div>
+
+        <div class="report-section">
+          <h2>Daily Breakdown</h2>
+          {% if report.daily_breakdown %}
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Daily Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for day in report.daily_breakdown %}
+              <tr>
+                <td>{{ day.date }}</td>
+                <td>{{ day.amount }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <p>No sales data</p>
+          {% endif %}
+        </div>
+
+        <a href="{{ url_for('reports') }}" class="btn btn-primary"
+          >Back to Reports</a
+        >
+      </div>
+    </div>
+  </body>
+</html>

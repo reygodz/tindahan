@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stock Management - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('inventory') }}" class="nav-link">Inventory</a>
+          <a href="{{ url_for('stock_management') }}" class="nav-link active"
+            >Stock Management</a
+          >
+          <a href="{{ url_for('sales_page') }}" class="nav-link">Sales</a>
+          {% if session.role == 'admin' %}
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          {% endif %}
+          <span class="username">{{ session.user }}</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Stock Management</h1>
+          <p>Manage product restocking and inventory adjustments</p>
+        </div>
+
+        {% if low_stock %}
+        <div class="alert alert-warning">
+          <strong>⚠️ Low Stock Alert:</strong> {{ low_stock|length }} product(s)
+          with low stock
+        </div>
+        {% endif %}
+
+        <div class="stock-grid">
+          <div class="stock-section">
+            <h2>Low Stock Products</h2>
+            {% if low_stock %}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Current Stock</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in low_stock %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.quantity }}</td>
+                  <td>
+                    <span
+                      class="badge {{ 'danger' if product.status == 'Out of Stock' else 'warning' }}"
+                      >{{ product.status }}</span
+                    >
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p>No low stock items</p>
+            {% endif %}
+          </div>
+
+          <div class="stock-section">
+            <h2>All Products Stock Levels</h2>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Current Stock</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for product in products %}
+                <tr>
+                  <td>{{ product.name }}</td>
+                  <td><strong>{{ product.quantity }}</strong></td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-success"
+                      onclick="openRestockModal('{{ product.id }}', '{{ product.name }}')"
+                    >
+                      Restock
+                    </button>
+                    <button
+                      class="btn btn-sm btn-danger"
+                      onclick="openAdjustModal('{{ product.id }}', '{{ product.name }}')"
+                    >
+                      Adjust
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Restock Modal -->
+    <div id="restockModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('restockModal')">&times;</span>
+        <h2>Restock Product</h2>
+        <form id="restockForm">
+          <input type="hidden" id="restockProductId" />
+          <div class="form-group">
+            <label>Product: <span id="restockProductName"></span></label>
+          </div>
+          <div class="form-group">
+            <label for="restockQty">Quantity to Add</label>
+            <input
+              type="number"
+              class="form-control"
+              id="restockQty"
+              min="1"
+              required
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitRestock()"
+          >
+            Increase Stock
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal('restockModal')"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Adjustment Modal -->
+    <div id="adjustModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal('adjustModal')">&times;</span>
+        <h2>Manual Stock Adjustment</h2>
+        <form id="adjustForm">
+          <input type="hidden" id="adjustProductId" />
+          <div class="form-group">
+            <label>Product: <span id="adjustProductName"></span></label>
+          </div>
+          <div class="form-group">
+            <label for="adjustQty">Quantity to Decrease</label>
+            <input
+              type="number"
+              class="form-control"
+              id="adjustQty"
+              min="1"
+              required
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-danger"
+            onclick="submitAdjustment()"
+          >
+            Decrease Stock
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal('adjustModal')"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function openRestockModal(id, name) {
+        document.getElementById("restockProductId").value = id;
+        document.getElementById("restockProductName").textContent = name;
+        document.getElementById("restockQty").value = "";
+        document.getElementById("restockModal").style.display = "block";
+      }
+
+      function openAdjustModal(id, name) {
+        document.getElementById("adjustProductId").value = id;
+        document.getElementById("adjustProductName").textContent = name;
+        document.getElementById("adjustQty").value = "";
+        document.getElementById("adjustModal").style.display = "block";
+      }
+
+      function closeModal(modalId) {
+        document.getElementById(modalId).style.display = "none";
+      }
+
+      function submitRestock() {
+        const formData = new FormData();
+        formData.append(
+          "product_id",
+          document.getElementById("restockProductId").value,
+        );
+        formData.append(
+          "quantity",
+          document.getElementById("restockQty").value,
+        );
+
+        fetch("/stock/increase", { method: "POST", body: formData })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Stock increased! New quantity: " + data.new_qty);
+              location.reload();
+            } else {
+              alert("Error: " + data.message);
+            }
+          });
+      }
+
+      function submitAdjustment() {
+        const formData = new FormData();
+        formData.append(
+          "product_id",
+          document.getElementById("adjustProductId").value,
+        );
+        formData.append("quantity", document.getElementById("adjustQty").value);
+
+        fetch("/stock/decrease", { method: "POST", body: formData })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success) {
+              alert("Stock decreased! New quantity: " + data.new_qty);
+              location.reload();
+            } else {
+              alert("Error: " + data.message);
+            }
+          });
+      }
+
+      window.onclick = function (e) {
+        ["restockModal", "adjustModal"].forEach((id) => {
+          const modal = document.getElementById(id);
+          if (e.target === modal) modal.style.display = "none";
+        });
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales - Tindahan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav class="navbar">
+        <div class="navbar-brand">TINDAHAN</div>
+        <div class="navbar-menu">
+          <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+          <a href="{{ url_for('inventory') }}" class="nav-link">Inventory</a>
+          <a href="{{ url_for('sales_page') }}" class="nav-link active"
+            >Sales</a
+          >
+          <a href="{{ url_for('reports') }}" class="nav-link">Reports</a>
+          <span class="username">User</span>
+          <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+        </div>
+      </nav>
+
+      <div class="main-content">
+        <div class="page-header">
+          <h1>Process Sale</h1>
+        </div>
+
+        <div class="sales-container">
+          <div class="sales-form-section">
+            <h2>New Transaction</h2>
+            <form id="saleForm">
+              <div class="form-group">
+                <label for="productSelect">Select Product</label>
+                <select
+                  class="form-control"
+                  id="productSelect"
+                  required
+                  onchange="updatePrice()"
+                >
+                  <option value="">-- Choose Product --</option>
+                  {% for product in products %}
+                  <option
+                    value="{{ product.id }}"
+                    data-price="{{ product.price }}"
+                    data-qty="{{ product.quantity }}"
+                  >
+                    {{ product.name }} - Stock: {{ product.quantity }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="unitPrice">Unit Price</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="unitPrice"
+                    readonly
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="quantity">Quantity</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="quantity"
+                    min="1"
+                    value="1"
+                    required
+                    onchange="calculateTotal()"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="totalPrice">Total Price</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="totalPrice"
+                  readonly
+                />
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-success"
+                onclick="processSale()"
+              >
+                Process Sale
+              </button>
+            </form>
+          </div>
+
+          <div class="recent-sales-section">
+            <h2>Recent Transactions</h2>
+            {% if recent_sales %}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Unit Price</th>
+                  <th>Total</th>
+                  <th>Cashier</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sale in recent_sales %}
+                <tr>
+                  <td>{{ sale.timestamp }}</td>
+                  <td>{{ sale.product }}</td>
+                  <td>{{ sale.quantity }}</td>
+                  <td>{{ sale.unit_price }}</td>
+                  <td>{{ sale.total }}</td>
+                  <td>{{ sale.cashier }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p>No sales yet</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePrice() {
+        const select = document.getElementById("productSelect");
+        const option = select.options[select.selectedIndex];
+        document.getElementById("unitPrice").value = option.dataset.price || "";
+        calculateTotal();
+      }
+
+      function calculateTotal() {
+        const price =
+          parseFloat(document.getElementById("unitPrice").value) || 0;
+        const qty = parseInt(document.getElementById("quantity").value) || 1;
+        document.getElementById("totalPrice").value = (price * qty).toFixed(2);
+      }
+
+      function processSale() {
+        const productId = document.getElementById("productSelect").value;
+        const quantity = document.getElementById("quantity").value;
+
+        if (!productId) {
+          alert("Please select a product");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("product_id", productId);
+        formData.append("quantity", quantity);
+
+        fetch("/sales/process", { method: "POST", body: formData })
+          .then((r) => r.json())
+          .then((data) => {
+            if (data.success) {
+              alert(
+                "Sale processed! Transaction ID: " +
+                  data.transaction.transaction_id,
+              );
+              document.getElementById("saleForm").reset();
+              location.reload();
+            } else {
+              alert("Error: " + data.message);
+            }
+          });
+      }
+    </script>
+  </body>
+</html>
