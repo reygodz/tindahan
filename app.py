@@ -13,6 +13,7 @@ app.secret_key = 'tindahan_secret_key_2026'
 users = {
     "admin": {"password": "admin123", "role": "admin"},
     "staff": {"password": "staff123", "role": "staff"},
+    "qqqq": {"password": "12345", "role": "staff"},
 }
 
 # Products: {product_id: {'name': str, 'price': float, 'quantity': int}}
