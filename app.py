@@ -14,6 +14,7 @@ users = {
     "admin": {"password": "admin123", "role": "admin"},
     "staff": {"password": "staff123", "role": "staff"},
     "qqqq": {"password": "12345", "role": "staff"},
+    "pppp": {"password": "pppp", "role": "staff"},
 }
 
 # Products: {product_id: {'name': str, 'price': float, 'quantity': int}}
